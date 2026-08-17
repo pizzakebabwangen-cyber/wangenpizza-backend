@@ -1,0 +1,78 @@
+@model WangenPizza.Dtos.ExtensionDto
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Extrabestellungen bearbeiten </h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="Extension" asp-action="Edit" class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="text" hidden asp-for="Kind" value="MainExtension">
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Extra-Bezeichnung <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Preis <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Price" required="required" class="form-control ">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="DisplayOrder">
+                    Reihenfolge im Menü (Shop) <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="number" asp-for="DisplayOrder" required="required" class="form-control" min="0" step="1" />
+                    <p class="help-block" style="margin-top:6px;">Kleinere Zahl = weiter oben in der Extras-Liste im Onlineshop (gleiche Kategorie).</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Bestelltes Menü <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <select id="heard" asp-for="CategoryId" class="form-control" required="">
+                        <option value="">Choose..</option>
+                        @foreach (var category in ViewBag.CategoryList)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+
+                        }
+
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="Extension" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <!--                    <button class="btn btn-primary" type="reset">Zurücksetzen</button>  -->
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>

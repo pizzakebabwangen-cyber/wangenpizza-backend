@@ -1,0 +1,52 @@
+@model WangenPizza.Dtos.RestaurantImageDto
+@{
+    ViewData["Title"] = "Restaurant Bild bearbeiten";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Restaurant-Bild bearbeiten</h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        @if (!string.IsNullOrEmpty(Model.PhotoName))
+        {
+            <p><img src="~/Images/@Model.PhotoName" style="max-height:120px;" alt="" /></p>
+        }
+        <form asp-action="Edit" enctype="multipart/form-data" class="form-horizontal form-label-left">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="PhotoName" />
+            <div class="form-group">
+                <label class="control-label col-md-3">Neues Bild (optional)</label>
+                <div class="col-md-7">
+                    <input type="file" asp-for="Photo" class="form-control" accept="image/*" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Beschriftung</label>
+                <div class="col-md-7">
+                    <input type="text" asp-for="Caption" class="form-control" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Reihenfolge</label>
+                <div class="col-md-7">
+                    <input type="number" asp-for="SortOrder" class="form-control" min="0" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Hauptbild (Hero)</label>
+                <div class="col-md-7">
+                    <input type="checkbox" asp-for="IsHero" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3">
+                    <a asp-action="Index" class="btn btn-danger">Abbrechen</a>
+                    <input type="submit" class="btn btn-success" value="Speichern" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

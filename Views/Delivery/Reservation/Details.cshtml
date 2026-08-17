@@ -1,0 +1,96 @@
+﻿@model WangenPizza.Dtos.ReservationDto
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Details zur Reservation </h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="Reservation" asp-action="Edit" class="form-horizontal form-label-left" enctype="multipart/form-data">
+
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Anrede:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="Salute" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Name:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Anzahl Personen:
+                    
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="NumberOfPeople" required="required" class="form-control ">
+                </div>
+            </div>
+            
+            
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Telefon:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="Phone" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    E-mail:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="Email" required="required" class="form-control ">
+                </div>
+            </div>
+             <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Datum:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="RDate" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Zeit:
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input readonly type="text" asp-for="RTime" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 ">Notizen:</label>
+                <div class="col-md-7 col-sm-12 col-xs-12 ">
+                    <textarea readonly class="resizable_textarea form-control" asp-for="Notes"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary" type="button">Ok</a>
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>

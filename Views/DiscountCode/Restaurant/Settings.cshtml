@@ -1,0 +1,55 @@
+@model WangenPizza.Dtos.RestaurantSettingsDto
+@{
+    ViewData["Title"] = "Restaurant Einstellungen";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Restaurant-Seite: Text & Video</h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <form asp-action="Settings" method="post" enctype="multipart/form-data" class="form-horizontal form-label-left">
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label class="control-label col-md-3">Titel</label>
+                <div class="col-md-7">
+                    <input type="text" asp-for="Title" class="form-control" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Beschreibung</label>
+                <div class="col-md-7">
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Video hochladen</label>
+                <div class="col-md-7">
+                    <input type="file" asp-for="Video" class="form-control" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" />
+                    <span class="help-block">MP4, WebM oder MOV — max. ca. 100 MB</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.VideoUrl))
+                    {
+                        <p class="help-block" style="margin-top:8px;">
+                            Aktuell: <a href="@Model.VideoUrl" target="_blank" rel="noopener">@Model.VideoUrl</a>
+                        </p>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">Video-URL (optional)</label>
+                <div class="col-md-7">
+                    <input type="text" asp-for="VideoUrl" class="form-control" placeholder="https://… YouTube oder direkte .mp4" />
+                    <span class="help-block">Alternativ zu Upload: YouTube-Link oder direkte Video-URL</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3">
+                    <a asp-action="Index" class="btn btn-danger">Abbrechen</a>
+                    <input type="submit" class="btn btn-success" value="Speichern" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

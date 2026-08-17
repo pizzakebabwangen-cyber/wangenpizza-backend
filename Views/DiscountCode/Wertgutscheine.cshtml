@@ -1,0 +1,85 @@
+@model IEnumerable<WangenPizza.Models.DiscountCode>
+
+@{
+    ViewData["Title"] = "Gutscheine";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@functions {
+    private static decimal OriginalValue(WangenPizza.Models.DiscountCode item)
+    {
+        return item.OriginalValueChf > 0m ? item.OriginalValueChf : (decimal)item.Value;
+    }
+
+    private static string CreatedAt(WangenPizza.Models.DiscountCode item)
+    {
+        var created = item.CreatedAtUtc == default ? item.ExpiryDate : item.CreatedAtUtc;
+        return created.ToString("yyyy-MM-dd HH:mm");
+    }
+
+    private static string Note(WangenPizza.Models.DiscountCode item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Note))
+            return item.Note;
+
+        var parts = (item.Name ?? string.Empty).Split('-', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 && int.TryParse(parts[1], out var orderId)
+            ? $"Webkauf Order #{orderId}"
+            : "-";
+    }
+}
+
+<div class="x_panel">
+    <div class="x_title" style="display: flex;justify-content: space-between;align-items:center;">
+        <h2 style="overflow:initial;font-weight: 800;font-size: 20px;">Wertgutscheine</h2>
+        <a asp-controller="DiscountCode" asp-action="Create" class="btn btn-success">Neuer Gutschein</a>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Wert (CHF)</th>
+                        <th>Rest (CHF)</th>
+                        <th>Aktiv</th>
+                        <th>Erstellt (UTC)</th>
+                        <th>Notiz</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="font-weight: 700;color:#c0392b;">@item.Name</td>
+                            <td>@OriginalValue(item).ToString("0.##")</td>
+                            <td>@(((decimal)item.Value).ToString("0.##"))</td>
+                            <td>@(item.IsActive ? "Ja" : "Nein")</td>
+                            <td>@CreatedAt(item)</td>
+                            <td>@Note(item)</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <form asp-controller="DiscountCode" asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-warning btn-xs">Deaktivieren</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7">Keine Wertgutscheine gefunden.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

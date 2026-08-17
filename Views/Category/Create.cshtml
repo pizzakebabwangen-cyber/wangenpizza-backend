@@ -1,0 +1,54 @@
+@model WangenPizza.Dtos.CategoryDto
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Hauptmenü-Kategorien erstellen </h2>
+        
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form  asp-controller="Category" asp-action="Create"  class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Haputmenü-Bezeichnung <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="last-name">
+                    Hauptmenü-Bild <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="file"  asp-for="Photo" required="required" class="form-control ">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3">
+                    Reihenfolge im Menü (Shop)
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="number" asp-for="DisplayOrder" class="form-control" value="0" min="0" step="1" />
+                    <span class="help-block">0 = automatisch ans Ende. Sonst: kleinere Zahl = weiter oben.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="Category" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <!-- <button class="btn btn-primary" type="reset">Zurücksetzen</button>  -->
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

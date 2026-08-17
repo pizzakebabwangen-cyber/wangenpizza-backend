@@ -1,0 +1,37 @@
+# Build results
+bin/
+obj/
+publish-*/
+artifacts/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# NuGet
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Zip files
+*.zip
+newfile.zip
+
+# Root-level DLLs and EXEs (these are build outputs, not source)
+*.dll
+*.exe
+*.pdb
+*.xml

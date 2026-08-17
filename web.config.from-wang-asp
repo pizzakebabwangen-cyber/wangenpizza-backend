@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Stand: 2026-04-05 — requestTimeout (SignalR SSE/LP; ANCM kennt kein responseBufferLimit auf aspNetCore) -->
+<configuration>
+  <location path="." inheritInChildApplications="false">
+    <system.webServer>
+      <handlers>
+        <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+      </handlers>
+      <!-- Long Polling hält HTTP Requests offen; Default-Timeout zu kurz → disconnect / kein Push -->
+      <!-- logs-Ordner auf dem Server anlegen + Schreibrechte für App-Pool-Identität; nach Fehleranalyse wieder false setzen -->
+      <!-- outofprocess: oft stabiler auf Shared Hosting / wenn 500.30 mit inprocess -->
+      <aspNetCore processPath="dotnet" arguments=".\WangenPizza.dll" stdoutLogEnabled="true" stdoutLogFile=".\logs\stdout" hostingModel="outofprocess" requestTimeout="00:20:00" forwardWindowsAuthToken="false" />
+    </system.webServer>
+  </location>
+</configuration>
+<!--ProjectGuid: 436C951B-CAC0-4CF3-AA9C-5231AAB5B4B0-->

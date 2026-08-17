@@ -1,0 +1,55 @@
+@model IEnumerable<WangenPizza.Models.Order>
+@{
+    ViewData["Title"] = "Wertgutscheine";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Wertgutscheine <small>Online-Bestellungen (Zahlung & Betrag)</small></h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <p class="text-muted">
+            Hier erscheinen Bestellungen aus dem Shop-Bereich «Gutscheine bestellen». Kunde «verbraucht» den Guthaben-Gutschein später beim Essenbestellen (Rabattcode) — der Verkauf ist diese Liste.
+        </p>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Datum</th>
+                        <th>Name</th>
+                        <th>E-Mail</th>
+                        <th class="text-end">CHF</th>
+                        <th>Bezahlt</th>
+                        <th>Notiz / Details</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var o in Model)
+                    {
+                        <tr>
+                            <td>@o.Id</td>
+                            <td>@o.DateAdded.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@(o.Name ?? "—")</td>
+                            <td>@(o.Email ?? "—")</td>
+                            <td class="text-end">@o.FinalTotalNumber.ToString("F2")</td>
+                            <td>@(o.IsPaymentSucceeded || o.PaymentWay == 1 ? "Bezahlt" : "Ausstehend")</td>
+                            <td style="max-width:360px;white-space:pre-wrap;font-size:12px;">@(o.Notes ?? "—")</td>
+                            <td><a class="btn btn-xs btn-primary" asp-controller="Order" asp-action="Details" asp-route-id="@o.Id">Details</a></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8">Keine Wertgutschein-Bestellungen gefunden.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

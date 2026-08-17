@@ -1,0 +1,375 @@
+@using WangenPizza.Helper
+@model WangenPizza.Dtos.OrderDetailsDto
+@{
+    Layout = null;
+    var orderPostBox = (Model.PostBox ?? string.Empty).Trim();
+    var orderCity = (Model.City ?? string.Empty).Trim();
+    if (!string.IsNullOrEmpty(orderPostBox) && orderCity.StartsWith(orderPostBox + " ", StringComparison.OrdinalIgnoreCase))
+    {
+        orderCity = orderCity.Substring(orderPostBox.Length).Trim();
+    }
+    var orderAddressLine = string.IsNullOrWhiteSpace(orderPostBox)
+        ? orderCity
+        : string.IsNullOrWhiteSpace(orderCity)
+            ? orderPostBox
+            : $"{orderPostBox} {orderCity}";
+    TimeZoneInfo zurichTimeZone;
+    try
+    {
+        zurichTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Zurich");
+    }
+    catch
+    {
+        zurichTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+    }
+    var dateAddedUtc = Model.DateAdded.Kind == DateTimeKind.Utc
+        ? Model.DateAdded
+        : DateTime.SpecifyKind(Model.DateAdded, DateTimeKind.Utc);
+    var dateAddedZurich = TimeZoneInfo.ConvertTimeFromUtc(dateAddedUtc, zurichTimeZone);
+    var wishDisplay = OrderConfirmationMailHelper.FormatOrderWishDisplay(Model.DeliveryDate, Model.DeliveryTime);
+    var items = Model.Items ?? new List<WangenPizza.Models.OrderItem>();
+    var dishCount = items.Sum(i => i.Quantity);
+    var groupedItems = items
+        .GroupBy(i => string.IsNullOrWhiteSpace(i.Product?.SubCategory?.Name) ? "Sonstiges" : i.Product!.SubCategory!.Name)
+        .OrderBy(g => g.Key);
+
+    var isDeliveryForKurier = KurierQrHelper.IsDeliveryPickupType(Model.Pickup_type);
+    var kurierDest = $"{Model.Street} {Model.PostBox} {Model.City}".Trim();
+    string? kurierMapsUrl = null;
+    string? kurierQrImgUrl = null;
+    if (isDeliveryForKurier && !string.IsNullOrWhiteSpace(kurierDest))
+    {
+        kurierMapsUrl = KurierQrHelper.MapsRouteUrl(kurierDest);
+        var relQr = Url.Action("KurierQrPng", "Order", new { id = Model.Id });
+        kurierQrImgUrl = string.IsNullOrEmpty(relQr)
+            ? null
+            : $"{Context.Request.Scheme}://{Context.Request.Host.Value}{relQr}";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rechnung #@Model.Id - Wangen Pizza</title>
+    <style>
+        @@media print {
+            @@page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body {
+                width: 80mm;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            width: 80mm;
+            background: #fff;
+            color: #111;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .container {
+            padding: 3mm 0;
+            width: 68mm;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .status-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .address-block {
+            font-weight: 700;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .meta-line {
+            color: #444;
+            font-size: 12px;
+            margin: 3px 0;
+            word-break: break-word;
+        }
+
+        .customer-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 8px 0 4px;
+        }
+
+        .phone-line {
+            font-size: 13px;
+            margin: 2px 0;
+        }
+
+        .code-line {
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .accepted-line {
+            font-size: 11px;
+            color: #666;
+            margin: 6px 0 10px;
+        }
+
+        .order-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            margin: 8px 0 6px;
+            padding-top: 6px;
+            border-top: 1px solid #ddd;
+        }
+
+        .payment-tag {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .category-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin: 8px 0 4px;
+        }
+
+        .item-row,
+        .modifier-row,
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 4mm;
+            align-items: flex-start;
+        }
+
+        .item-row {
+            font-weight: 700;
+            margin: 4px 0 2px;
+        }
+
+        .item-qty-name {
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        .item-line-price,
+        .modifier-price,
+        .summary-value {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .modifier-row {
+            font-size: 11px;
+            color: #333;
+            padding-left: 3mm;
+            margin: 1px 0;
+        }
+
+        .note-badge {
+            display: inline-block;
+            background: #e8f4fc;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 11px;
+            margin: 6px 0 2px;
+            word-break: break-word;
+        }
+
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin: 6px 0;
+        }
+
+        .badge {
+            border: 1px solid #111;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .divider {
+            border-top: 1px dashed #999;
+            margin: 8px 0;
+        }
+
+        .kurier-qr {
+            text-align: center;
+            margin: 8px 0;
+            padding: 6px 0;
+            border-top: 1px dashed #999;
+            border-bottom: 1px dashed #999;
+        }
+
+        .kurier-qr img {
+            display: block;
+            width: 38mm;
+            height: 38mm;
+            margin: 0 auto 4px;
+        }
+
+        .kurier-qr-title {
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .kurier-qr-address {
+            font-size: 11px;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+
+        .wish-line {
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .wish-label {
+            font-weight: 700;
+        }
+
+        .summary {
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px solid #ccc;
+        }
+
+        .summary-row {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        .summary-total {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 2px solid #111;
+        }
+
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #444;
+            line-height: 1.25;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="invoiceContent">
+    <div class="status-title">@OrderConfirmationMailHelper.PickupTypeDisplay(Model.Pickup_type)</div>
+
+    <div class="address-block">@orderAddressLine@(string.IsNullOrWhiteSpace(Model.Street) ? "" : $", {Model.Street}")</div>
+    <div class="meta-line">#@Model.Id</div>
+
+    <div class="customer-name">@Model.Name</div>
+    @if (!string.IsNullOrWhiteSpace(Model.Phone))
+    {
+        <div class="phone-line">@Model.Phone</div>
+    }
+    <div class="code-line">Bestätigungscode: @Model.Id.ToString("D9")</div>
+    <div class="accepted-line">Bestellung vom @dateAddedZurich.ToString("HH:mm") - @dateAddedZurich.ToString("dd. MMM", new System.Globalization.CultureInfo("de-CH"))</div>
+
+    <div class="badge-row">
+        <span class="badge">@OrderConfirmationMailHelper.PickupTypeDisplay(Model.Pickup_type)</span>
+        <span class="badge">@(Model.PaymentWay == 1 ? "Barzahlung" : "Online")</span>
+    </div>
+
+    <div class="wish-line">
+        <span class="wish-label">@OrderConfirmationMailHelper.WishTerminLabel(Model.Pickup_type):</span>
+        @wishDisplay
+    </div>
+
+    @if (kurierQrImgUrl != null && kurierMapsUrl != null)
+    {
+        <div class="kurier-qr">
+            <img src="@kurierQrImgUrl" width="174" height="174" alt="QR Kurier" />
+            <div class="kurier-qr-title">Kurier - QR scannen</div>
+            <div class="kurier-qr-address">@kurierDest</div>
+        </div>
+    }
+
+    <div class="order-head">
+        <span>@dishCount Gerichte</span>
+        <span class="payment-tag">@(Model.PaymentWay == 1 ? "Bar" : "Online")</span>
+    </div>
+
+    @foreach (var group in groupedItems)
+    {
+        <div class="category-title">@group.Key</div>
+        @foreach (var item in group)
+        {
+            var productName = item.Product?.Name ?? "Produkt";
+            <div class="item-row">
+                <span class="item-qty-name">@item.Quantity @productName</span>
+                <span class="item-line-price">CHF @item.Subtotal.ToString("0.00")</span>
+            </div>
+            @if (item.ExtensionOrderItem != null)
+            {
+                foreach (var ext in item.ExtensionOrderItem)
+                {
+                    var extTotal = ext.Price * item.Quantity;
+                    <div class="modifier-row">
+                        <span>+ @ext.Name</span>
+                        <span class="modifier-price">CHF @extTotal.ToString("0.00")</span>
+                    </div>
+                }
+            }
+        }
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+    {
+        <div class="note-badge">@Model.Notes</div>
+    }
+
+    <div class="summary">
+        <div class="summary-row">
+            <span>Zwischensumme</span>
+            <span class="summary-value">CHF @((Model.TotalNumber ?? 0).ToString("0.00"))</span>
+        </div>
+        @if ((Model.DiscountValue ?? 0) > 0)
+        {
+            <div class="summary-row">
+                <span>Rabatt</span>
+                <span class="summary-value">-CHF @((Model.DiscountValue ?? 0).ToString("0.00"))</span>
+            </div>
+        }
+        <div class="summary-row summary-total">
+            <span>Gesamt</span>
+            <span class="summary-value">CHF @((Model.FinalTotalNumber ?? 0).ToString("0.00"))</span>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="footer">
+        <strong>@(Model.CompanyName ?? "Wangen Pizza Kebab")</strong><br />
+        @Model.CompanyStreet<br />
+        @Model.CompanyPostbox @Model.CompanyCity<br />
+        @Model.CompanyPhone1<br />
+        @Model.CompanyEmail
+    </div>
+</div>
+</body>
+</html>

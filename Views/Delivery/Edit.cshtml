@@ -1,0 +1,57 @@
+﻿@model WangenPizza.Dtos.DeliveryDto
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Liefergebiete bearbeiten</h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="Delivery" asp-action="Edit" class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Plz <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="PostBox" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Ort <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="City" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    ab CHF <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="OrderAb" required="required" class="form-control ">
+                </div>
+            </div>
+          
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="Delivery" asp-action="Index" class="btn btn-danger" type="button">Stornieren</a>
+                    <!--<button class="btn btn-primary" type="reset">Zurücksetzen</button> -->
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>

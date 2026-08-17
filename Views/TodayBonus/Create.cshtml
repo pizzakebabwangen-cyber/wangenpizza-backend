@@ -1,0 +1,67 @@
+﻿@model WangenPizza.Dtos.ProductDto
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Vergünstigte Tagesangebot bearbeiten </h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+        <form asp-controller="TodayBonus" asp-action="Create" class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <input type="text" hidden asp-for="ProductType" value="TodayBonus">
+            <input type="text" hidden asp-for="SubCategoryId" value="70">
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Angebot-Bezeichnung <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Zutaten <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Description" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Lieferpreis  <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Price" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Abholpreis <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Pickup_Price" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="last-name">
+                    Menübild <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="file" asp-for="Photo" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="TodayBonus" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <!-- <button class="btn btn-primary" type="reset">Zurücksetzen</button>  -->
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+@model WangenPizza.Dtos.DiscountCodeDto
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Rabattcode erstellen </h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="DiscountCode" asp-action="Create" class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Angebots-Titel
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Note" class="form-control " placeholder="z.B. Frühlings-Aktion 2026">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Bonus-Nr <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Rabatt in % <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Value" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Fallig bis <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input  asp-for="ExpiryDate" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Aktiv
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12" style="padding-top:8px;">
+                    <input type="checkbox" asp-for="IsActive">
+                    <span>Auf der Menü-Seite anzeigen</span>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="DiscountCode" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>
+@section Scripts {
+    @* jQuery UI already in _Layout; avoid duplicate load + broken global $ after noConflict *@
+    <script>
+        jQuery(function ($) {
+            $("input[name='ExpiryDate']").datepicker({
+                dateFormat: 'dd.mm.yy'
+            });
+        });
+    </script>
+}

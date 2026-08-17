@@ -1,0 +1,551 @@
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> signInManager
+@inject UserManager<ApplicationUser> userManager
+@inject WangenPizza.Interfaces.ICompanyService company
+
+
+@{
+
+
+    var days = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
+    var companyData = await company.GetById(1);
+    var PausefromDate = companyData.Pausefrom;
+    var PausetillDate = companyData.Pausetill;
+    var Pausetype = companyData.Pausetyp;
+
+    // Times for each day
+    var MondayFrom1 = companyData.MondayFrom1;
+    var MondayTill1 = companyData.MondayTill1;
+    var MondayFrom2 = companyData.MondayFrom2;
+    var MondayTill2 = companyData.MondayTill2;
+
+    var TuesdayFrom1 = companyData.TuesdayFrom1;
+    var TuesdayTill1 = companyData.TuesdayTill1;
+    var TuesdayFrom2 = companyData.TuesdayFrom2;
+    var TuesdayTill2 = companyData.TuesdayTill2;
+
+    var WednesdayFrom1 = companyData.WednesdayFrom1;
+    var WednesdayTill1 = companyData.WednesdayTill1;
+    var WednesdayFrom2 = companyData.WednesdayFrom2;
+    var WednesdayTill2 = companyData.WednesdayTill2;
+
+    var ThursdayFrom1 = companyData.ThursdayFrom1;
+    var ThursdayTill1 = companyData.ThursdayTill1;
+    var ThursdayFrom2 = companyData.ThursdayFrom2;
+    var ThursdayTill2 = companyData.ThursdayTill2;
+
+    var FridayFrom1 = companyData.FridayFrom1;
+    var FridayTill1 = companyData.FridayTill1;
+    var FridayFrom2 = companyData.FridayFrom2;
+    var FridayTill2 = companyData.FridayTill2;
+
+    var SaturdayFrom1 = companyData.SaturdayFrom1;
+    var SaturdayTill1 = companyData.SaturdayTill1;
+    var SaturdayFrom2 = companyData.SaturdayFrom2;
+    var SaturdayTill2 = companyData.SaturdayTill2;
+
+    var SundayFrom1 = companyData.SundayFrom1;
+    var SundayTill1 = companyData.SundayTill1;
+    var SundayFrom2 = companyData.SundayFrom2;
+    var SundayTill2 = companyData.SundayTill2;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wangen</title>
+    <link rel="icon" type="image/x-icon" href="~/Dashboard/images/logo.png" />
+    <link href="~/Dashboard/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Dashboard/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="~/Dashboard/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="~/Dashboard/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="~/Dashboard/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="~/Dashboard/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="~/Dashboard/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @* Do NOT load Bootstrap JS here — jQuery loads later in the body. BS4 in head breaks Gentelella (BS3) and causes "Bootstrap requires jQuery". Body loads ~/Dashboard/vendors/bootstrap/dist/js/bootstrap.min.js after jQuery. *@
+    <style>
+
+        .toast-order {
+            background-color: green !important; /* Ensure important to override default styles */
+        }
+
+        .toast-alert {
+            background-color: orange !important; /* Ensure important to override default styles */
+        }
+
+        .toast-default {
+            background-color: red !important; /* Ensure important to override default styles */
+        }
+    </style>
+    @await RenderSectionAsync("Links", required: false)
+
+    <!-- Datatables -->
+    <!-- Custom Theme Style -->
+    <link href="~/Dashboard/build/css/custom.min.css" rel="stylesheet">
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a asp-controller="Home" asp-action="Index" class="site_title" style="text-align:center;"> <img src="~/Dashboard/images/logo.png" style="width:60px" /> </a>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <!-- menu profile quick info -->
+                    <!-- /menu profile quick info -->
+
+                    <br />
+
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            <ul class="nav side-menu">
+                                <li class="nav.side-menu-item"><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i> Startseite</a></li>
+
+                                <li>
+                                    <a style="font-weight:800;"><i class="fa fa-gears"></i> Einstellungen <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a asp-controller="Category" asp-action="Index"><i class="fa fa-clone"></i>Unser Menü  </a></li>
+                                        <li><a asp-controller="SubCategory" asp-action="Index"><i class="fa fa-sitemap"></i>Menügruppen   </a></li>
+                                        <li><a asp-controller="Product" asp-action="Index"><i class="fa fa-cutlery"></i>Menüprodukte  </a></li>
+                                        <li><a asp-controller="Offer" asp-action="Index"><i class="fa fa-cubes"></i>Tagesangebot  </a></li>
+                                        <li><a asp-controller="TodayBonus" asp-action="Index"><i class="fa fa-cubes"></i>  Günstige Angebote   </a></li>
+                                        <li><a asp-controller="Extension" asp-action="Index"><i class="fa fa-clone"></i>Extra Bestellungen  </a></li>
+
+                                        <li><a asp-controller="Delivery" asp-action="Index"><i class="fa fa-car"></i> Liefergebiete </a></li>
+                                        <li><button style="font-size:12px;" data-toggle="modal" data-target=".bs-example-modal-lg" asp-controller="Company" asp-action="ShortBreak" asp-route-id="1"><i class="fa fa-close"></i> Kurzo Pause</button></li>
+
+
+                                        <li><a asp-controller="Company" asp-action="Edit" asp-route-id="1"><i class="fa fa-info-circle"></i> Firmendaten</a></li>
+                                        <li><a asp-controller="Restaurant" asp-action="Index"><i class="fa fa-camera"></i> Restaurant / Galerie</a></li>
+                                    </ul>
+                                </li>
+
+
+                                <li class="nav.side-menu-item"><a asp-controller="Order" asp-action="Index" style="font-weight:800;"> <i class="fa fa-shopping-cart"></i>Alle Bestellungen  </a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="Order" asp-action="Pos"><i class="fa fa-desktop"></i> POS-Ansicht  </a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="Order" asp-action="Wertgutscheine"><i class="fa fa-gift"></i> Wertgutscheine (Verkauf)</a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="DiscountCode" asp-action="Wertgutscheine"><i class="fa fa-gift"></i> Gutscheine</a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="DiscountCode" asp-action="Index"><i class="fa fa-sort-amount-desc"></i>Bonus verwalten </a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="Reservation" asp-action="Index"><i class="fa fa-clone"></i>Reservationen  </a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="Contact" asp-action="Index"><i class="fa fa-phone-square"></i>Kontakt verwalten </a></li>
+                                <li class="nav.side-menu-item"><a asp-controller="EmailText" asp-action="Index"><i class="fa fa-comments-o"></i>Korrespondenz-Texte </a></li>
+
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!-- /sidebar menu -->
+
+
+                </div>
+            </div>
+            <!-- modal -->
+            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+
+                        <div class="modal-header bg-primary">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <h4 class="modal-title text-center" id="myModalLabel">
+                                Vorübergehende Einstellung der Arbeit
+                            </h4>
+                        </div>
+
+                        <form asp-controller="Company" asp-action="ShortBreak" method="post">
+                            <div class="modal-body">
+                                <h4>
+                                    Restaurant schliessen:
+                                </h4>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="Pausefrom">von</label>
+                                                <input id="Pausefrom" type="text" value="@PausefromDate?.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture)" name="Pausefrom" class="form-control" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="Pausetill">bis</label>
+                                                <input id="Pausetill" type="text" value="@PausetillDate?.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture)" name="Pausetill" class="form-control" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                    @*     <div class="col-md-6"> *@
+                                    @*         <div class="form-check"> *@
+                                    @*             <input type="radio" id="CloseRestaurant" name="Pausetyp" value="2" class="form-check-input" *@
+                                    @*             @(Pausetype == 2 ? "checked" : "")> *@
+                                    @*             <label class="form-check-label" for="CloseRestaurant">Restaurant schliessen</label> *@
+                                    @*         </div> *@
+                                    @*     </div> *@
+                                    @*     <div class="col-md-6"> *@
+                                    @*         <div class="form-check"> *@
+                                    @*             <input type="radio" id="PauseOrders" name="Pausetyp" value="1" class="form-check-input" *@
+                                    @*             @(Pausetype == 1 ? "checked" : "")> *@
+                                    @*             <label class="form-check-label" for="PauseOrders">Bestellungen pausieren</label> *@
+                                    @*         </div> *@
+                                    @*     </div> *@
+                                    @*     <div class="col-md-6"> *@
+                                    @*         <div class="form-check"> *@
+                                    @*             <input type="radio" id="PauseAnother" name="Pausetyp" value="3" class="form-check-input" *@
+                                    @*             @(Pausetype == 3 ? "checked" : "")> *@
+                                    @*             <label class="form-check-label" for="PauseAnother">Restaurant neu starten </label> *@
+                                    @*         </div> *@
+                                    @*     </div> *@
+                                    </div>
+
+                                    <hr />
+
+                                    <h2 style="font-weight: 900;" class="text-primary">
+                                        Zulässige Bestelltermine:
+                                    </h2>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>von</th>
+                                                <th>bis</th>
+                                                <th></th>
+                                                <th>von</th>
+                                                <th>bis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Montag</td>
+                                                <td><input type="text" name="MondayFrom1" class="form-control time-input" value="@MondayFrom1" /></td>
+                                                <td><input type="text" name="MondayTill1" class="form-control time-input" value="@MondayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+                                                <td><input type="text" name="MondayFrom2" class="form-control time-input" value="@MondayFrom2" /></td>
+                                                <td><input type="text" name="MondayTill2" class="form-control time-input" value="@MondayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Dienstag</td>
+                                                <td><input type="text" name="TuesdayFrom1" class="form-control time-input" value="@TuesdayFrom1" /></td>
+                                                <td><input type="text" name="TuesdayTill1" class="form-control time-input" value="@TuesdayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="TuesdayFrom2" class="form-control time-input" value="@TuesdayFrom2" /></td>
+                                                <td><input type="text" name="TuesdayTill2" class="form-control time-input" value="@TuesdayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mittwoch</td>
+                                                <td><input type="text" name="WednesdayFrom1" class="form-control time-input" value="@WednesdayFrom1" /></td>
+                                                <td><input type="text" name="WednesdayTill1" class="form-control time-input" value="@WednesdayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="WednesdayFrom2" class="form-control time-input" value="@WednesdayFrom2" /></td>
+                                                <td><input type="text" name="WednesdayTill2" class="form-control time-input" value="@WednesdayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Donnerstag</td>
+                                                <td><input type="text" name="ThursdayFrom1" class="form-control time-input" value="@ThursdayFrom1" /></td>
+                                                <td><input type="text" name="ThursdayTill1" class="form-control time-input" value="@ThursdayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="ThursdayFrom2" class="form-control time-input" value="@ThursdayFrom2" /></td>
+                                                <td><input type="text" name="ThursdayTill2" class="form-control time-input" value="@ThursdayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Freitag</td>
+                                                <td><input type="text" name="FridayFrom1" class="form-control time-input" value="@FridayFrom1" /></td>
+                                                <td><input type="text" name="FridayTill1" class="form-control time-input" value="@FridayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="FridayFrom2" class="form-control time-input" value="@FridayFrom2" /></td>
+                                                <td><input type="text" name="FridayTill2" class="form-control time-input" value="@FridayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Samstag</td>
+                                                <td><input type="text" name="SaturdayFrom1" class="form-control time-input" value="@SaturdayFrom1" /></td>
+                                                <td><input type="text" name="SaturdayTill1" class="form-control time-input" value="@SaturdayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="SaturdayFrom2" class="form-control time-input" value="@SaturdayFrom2" /></td>
+                                                <td><input type="text" name="SaturdayTill2" class="form-control time-input" value="@SaturdayTill2" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sonntag</td>
+                                                <td><input type="text" name="SundayFrom1" class="form-control time-input" value="@SundayFrom1" /></td>
+                                                <td><input type="text" name="SundayTill1" class="form-control time-input" value="@SundayTill1" /></td>
+                                                <td><p style="align-items: center;text-align: center;justify-content: center;" class="text-primary">&</p></td>
+
+                                                <td><input type="text" name="SundayFrom2" class="form-control time-input" value="@SundayFrom2" /></td>
+                                                <td><input type="text" name="SundayTill2" class="form-control time-input" value="@SundayTill2" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Ok</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+          
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle" style="display: flex;align-items: center;">
+                            <a style="margin-bottom: 10px;" id="menu_toggle"><i class="fa fa-bars"></i></a>
+                            <button id="notifyButton" class="btn btn-warning">Ton abspielen</button>
+
+                        </div>
+
+                        <ul class="nav navbar-nav navbar-right">
+
+                            <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="~/Dashboard/images/img.jpg" alt="">                @if (signInManager.IsSignedIn(User))
+                                    {
+                                        @User.Identity.Name
+                                    }
+
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+
+                                    <li style="padding: 12px 20px;width: 100%;">
+
+                                        <form asp-controller="Account" asp-action="LogOut">
+                                            <input type="submit" class="btn btn-primary align-middle" style="" value="Ausloggen" />
+
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a asp-controller="Order" asp-action="Index" class=" info-number">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span id="notificationCount" class="badge bg-green">0</span>
+                                </a>
+                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                </ul>
+
+                            </li>
+
+
+
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+            <!-- page content -->
+            <div class="right_col" role="main" style="background-image:url('@Url.Content("~/Dashboard/images/Dashboardbg.png")');height:100vh ;  background-size: cover;">
+                <!-- top tiles -->
+
+                   <audio id="orderNotificationSound" src="~/Dashboard/Sound/Notify.mp3" preload="auto"></audio>
+                 <audio id="dafualtNotificationSound" src="~/Dashboard/Sound/Notify.mp3" preload="auto"></audio>
+                <audio id="alertNotificationSound" src="~/Dashboard/Sound/ReserrvationSound.mp3" preload="auto"></audio>
+
+
+
+
+
+                @RenderBody()
+
+            </div>
+            <!-- /page content -->
+            <!-- footer content -->
+            <!-- /footer content -->
+        </div>
+    </div>
+
+
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+
+    <script>
+                async function handlePaymentFailure(orderId) {
+            try {
+                const response = await fetch(`/api/Payment/failed?orderId=${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Add any other required headers here
+                    },
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Redirect to the desired URL from the API response
+                    window.location.href = result.redirectUrl;
+                } else {
+                    console.error('Failed to process payment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css" />
+
+    @* Single jQuery for this layout (Gentelella / Bootstrap 3 / Flot / jQuery UI). Do not add a second copy (e.g. ajax.googleapis.com). *@
+    <script src="~/Dashboard/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="~/Dashboard/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <!-- Custom Theme Scripts (requires jQuery + Bootstrap: top-level code touches $.fn.popover) -->
+    <script src="~/Dashboard/build/js/custom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/notification.js" asp-append-version="true"></script>
+    <script src="~/js/site.js"></script>
+
+    <script>
+        // Keep global $ as jQuery for Gentelella/Bootstrap; local $ inside ready only.
+        jQuery(document).ready(function ($) {
+            $("#Pausefrom, #Pausetill").datepicker({
+                dateFormat: "dd.mm.yy"
+            });
+            $(".time-input").timepicker({
+                timeFormat: 'HH:mm',
+                controlType: 'select',
+                oneLine: true
+            });
+        });
+    </script>
+
+    <script>
+         document.addEventListener('DOMContentLoaded', function () {
+            const notifyButton = document.getElementById('notifyButton');
+            if (!notifyButton) return;
+            notifyButton.addEventListener('click', function () {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Done ",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            });
+        });
+
+    </script>
+    @if (TempData["SuccessEmailMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Use SweetAlert to show the success message
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "@TempData["SuccessEmailMessage"]",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
+        </script>
+    }
+
+    @if (TempData["SuccessTimeMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Use SweetAlert to show the success message
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "@TempData["SuccessTimeMessage"]",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
+        </script>
+    }
+    <!-- FastClick -->
+    <script src="~/Dashboard/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="~/Dashboard/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="~/Dashboard/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="~/Dashboard/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="~/Dashboard/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="~/Dashboard/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="~/Dashboard/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="~/Dashboard/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="~/Dashboard/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="~/Dashboard/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="~/Dashboard/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="~/Dashboard/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="~/Dashboard/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="~/Dashboard/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="~/Dashboard/vendors/moment/min/moment.min.js"></script>
+    <script src="~/Dashboard/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/Dashboard/vendors/switchery/dist/switchery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pauseFrom = document.getElementById("Pausefrom");
+            const pauseTill = document.getElementById("Pausetill");
+            const radios = document.querySelectorAll('input[name="Pausetyp"]');
+
+            radios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.value === "2") {
+                        pauseFrom.removeAttribute("readonly");
+                        pauseTill.removeAttribute("readonly");
+                    } else {
+                        pauseFrom.setAttribute("readonly", "readonly");
+                        pauseTill.setAttribute("readonly", "readonly");
+                    }
+                });
+            });
+        });
+    </script>
+
+ 
+
+</body>
+</html>

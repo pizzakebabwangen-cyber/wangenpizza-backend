@@ -1,0 +1,328 @@
+﻿@model WangenPizza.Dtos.EmailDto
+@using Microsoft.AspNetCore.Identity
+@using QuickMover.Helper
+@inject SignInManager<ApplicationUser> signInManager
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    var AppUser = User.Identity.Name;
+    var user = await userManager.FindByEmailAsync(AppUser);
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Wangen</title>
+    <link rel="icon" type="image/x-icon" href="~/Dashboard/images/logo.png" />
+
+    <!-- Bootstrap -->
+    <link href="~/Dashboard/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Dashboard/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="~/Dashboard/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="~/Dashboard/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="~/Dashboard/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="~/Dashboard/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="~/Dashboard/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+
+
+    <!-- Datatables -->
+    <!-- Custom Theme Style -->
+    <link href="~/Dashboard/build/css/custom.min.css" rel="stylesheet">
+    <style>
+        #loading-sniper {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            z-index: 9999;
+        }
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+            border-top: 2px solid black;
+            border-bottom: 2px solid black;
+            animation: sniperAnimation 2s infinite;
+        }
+
+        @@keyframes sniperAnimation {
+            0% {
+                width: 0;
+                height: 0;
+                top: 50%;
+                left: 50%;
+            }
+
+            50% {
+                width: 50%;
+                height: 50%;
+                top: 25%;
+                left: 25%;
+            }
+
+            100% {
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                opacity: 0;
+            }
+        }
+
+    </style>
+
+
+
+</head>
+
+<body class="nav-md">
+
+    <div id="loading-sniper">
+        <div class="crosshair"></div>
+    </div>
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="index.html" class="site_title" style="text-align:center;"> <img src="~/Dashboard/images/logo.png" style="width:60px" /> </a>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <!-- menu profile quick info -->
+                    <div class="profile clearfix">
+                        <div class="profile_pic">
+                            <img src="~/Dashboard/images/img.jpg" alt="..." class="img-circle profile_img">
+                        </div>
+                        <div class="profile_info">
+                            <span>Willkommen,</span>
+                            @if (signInManager.IsSignedIn(User))
+                            {
+                                <h2>@User.Identity.Name </h2>
+                            }
+                        </div>
+                    </div>
+                    <!-- /menu profile quick info -->
+
+                    <br />
+
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            <ul class="nav side-menu">
+
+
+                                @foreach (var item in ViewBag.Texts)
+                                {
+                                    <li style="font-size: 18px;color: white;margin: 10px;" class="title" data-id="@item.Id"><i class="fa fa-caret-right"></i> @item.Title</li>
+
+                                }
+
+
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!-- /sidebar menu -->
+
+
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="~/Dashboard/images/img.jpg" alt="">                @if (signInManager.IsSignedIn(User))
+                                    {
+                                        @User.Identity.Name
+                                    }
+
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+
+                                    <li style="padding: 12px 20px;width: 100%;">
+
+                                        <form asp-controller="Account" asp-action="LogOut">
+                                            <input type="submit" class="btn btn-primary align-middle" style="" value="Ausloggen" />
+
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+
+
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+            <!-- page content -->
+            <div class="right_col" role="main" style="background-image:url('@Url.Content("~/Dashboard/images/Dashboardbg.png")');height:100vh">
+                <!-- top tiles -->
+                <div class="x_panel">
+                    <div class="x_title" style="background-color:#EDEDED">
+                        <h1 class="text-center" style="font-size:20px;">Senden Sie E-Mails an <span style="font-weight:800;color: black;"> @ViewBag.Email (@ViewBag.Username)</span></h1>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <br />
+
+
+                        <form id="myForm" asp-controller="Email" asp-action="SendToUsers" class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
+                            @*                              <div class="form-group">
+                            <label class="control-label col-md-3" for="first-name">
+                            Content <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7 col-sm-12 col-xs-12">
+                            <textarea type="text" asp-for="Message" name="Message" id="Message" class="form-control " rows="10"></textarea>
+
+                            </div>
+
+                            </div> *@
+
+                            <textarea asp-for="Message" id="editor" ></textarea>
+
+
+
+
+                            <div class="form-group">
+                                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                    <a asp-controller="Users" asp-action="IndexOfUsers" class="btn btn-danger" type="button">Stornieren</a>
+                                    <!--   <button class="btn btn-primary" type="reset">Zurücksetzen</button>  -->
+                                    <input type="submit" class="btn btn-success" value="Speichern">
+                                </div>
+                            </div>
+                        </form>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- /page content -->
+            <!-- footer content -->
+            <!-- /footer content -->
+        </div>
+    </div>
+    <!-- Include jQuery 2.2.4 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha512-DUC8yqWf7ez3JD1jszxCWSVB0DMP78eOyBpMa5aJki1bIRARykviOuImIczkxlj1KhVSyS16w2FSQetkD4UU2w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Include CKEditor 4 script -->
+    <script src="https://cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var editor;
+
+            // Initialize CKEditor
+            CKEDITOR.replace('editor', {
+                // CKEditor configuration options
+                height: 400,
+                toolbar: [
+                    { name: 'document', items: ['Source', '-', 'NewPage', 'Preview', '-', 'Templates'] },
+                    { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+                    { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt'] },
+                    { name: 'insert', items: ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe'] },
+                    '/',
+                    { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl'] },
+                    { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+                    { name: 'tools', items: ['Maximize', 'ShowBlocks'] },
+                    { name: 'others', items: ['-'] },
+                    { name: 'about', items: ['About'] }
+                ]
+            });
+
+            $('.title').click(function () {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/EmailText/GetText/' + id,
+                    type: 'GET',
+                    success: function (data) {
+                        // Set the fetched content in the CKEditor
+                        CKEDITOR.instances.editor.setData(data.content);
+                    },
+                    error: function () {
+                        alert('Error occurred while fetching text.');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- jQuery -->
+    <!-- Bootstrap -->
+    <script src="~/Dashboard/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="~/Dashboard/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="~/Dashboard/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="~/Dashboard/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="~/Dashboard/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="~/Dashboard/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="~/Dashboard/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="~/Dashboard/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="~/Dashboard/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="~/Dashboard/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="~/Dashboard/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="~/Dashboard/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="~/Dashboard/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="~/Dashboard/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="~/Dashboard/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="~/Dashboard/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+
+
+
+
+    <!-- Custom Theme Scripts -->
+    <script src="~/Dashboard/build/js/custom.min.js"></script>
+
+</body>
+</html>

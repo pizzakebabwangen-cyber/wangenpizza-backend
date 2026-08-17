@@ -1,0 +1,364 @@
+@using WangenPizza.Helper
+@model List<WangenPizza.Models.Order>
+@{
+    ViewData["Title"] = "POS-Ansicht";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var neu = Model.Where(o => !o.PosAcknowledged).ToList();
+    var gedruckt = Model.Where(o => o.PosAcknowledged).ToList();
+}
+
+<style>
+    .pos-page h2 { font-weight: 800; margin-bottom: 1rem; }
+    .pos-section-title { font-size: 18px; font-weight: 700; margin: 1.5rem 0 1rem; color: #333; }
+    .pos-cards { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: stretch; }
+    .pos-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        padding: 1.25rem;
+        min-width: 320px;
+        max-width: 420px;
+        flex: 1 1 340px;
+        border: 1px solid #e8e8e8;
+    }
+    .pos-badges { margin-bottom: .75rem; }
+    .pos-badges .label { font-size: 12px; padding: .35em .65em; margin-right: 4px; display: inline-block; }
+    .pos-name { font-size: 17px; font-weight: 700; margin-bottom: .35rem; }
+    .pos-addr { color: #555; font-size: 14px; margin-bottom: 1rem; line-height: 1.4; }
+    .pos-qr-wrap { text-align: center; margin: .75rem 0; }
+    .pos-qr-wrap img { max-width: 120px; height: auto; }
+    .pos-qr-label { font-size: 11px; color: #888; margin-top: 4px; }
+    .pos-total { font-size: 20px; font-weight: 800; margin: .75rem 0; color: #c0392b; }
+    .pos-items { font-size: 14px; margin: .5rem 0 1rem; padding-left: 1.1rem; color: #333; }
+    .pos-prep { margin: 1rem 0; }
+    .pos-prep-hint { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #444; }
+    .pos-prep-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+    .pos-prep-stepper .prep-minus,
+    .pos-prep-stepper .prep-plus { min-width: 44px; font-size: 18px; font-weight: 700; line-height: 1; }
+    .posprep-send-btn { margin-top: 10px; width: 100%; font-weight: 600; }
+    .pos-prep-quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; justify-content: center; }
+    .pos-prep-quick-btns .prep-quick { font-size: 12px; padding: 4px 8px; }
+    .pos-prep-quick-btns .prep-quick.active { background: #5bc0de; color: #fff; border-color: #46b8da; }
+    .pos-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0; }
+    .pos-actions .btn { flex: 1 1 120px; }
+    .pos-empty { color: #888; font-style: italic; padding: 1rem 0; }
+    /* Vor Akzeptieren: Hinweis oben, Buttons unten. Nach Akzeptieren: Buttons direkt unter Artikeln, Lieferzeit darunter. */
+    .pos-card-tail {
+        display: flex;
+        flex-direction: column;
+        margin-top: .35rem;
+    }
+    .pos-tail-prep { order: 1; }
+    .pos-tail-actions { order: 2; }
+    .pos-card--acknowledged .pos-tail-prep { order: 2; margin-top: .75rem; }
+    .pos-card--acknowledged .pos-tail-actions { order: 1; }
+    .pos-card--acknowledged .pos-prep { margin-top: 0; margin-bottom: 0; }
+</style>
+
+<!-- pos-ui:PosStepper (alter Dateiname Pos.cshtml auf dem Server wird nicht mehr geladen) -->
+<div class="row pos-page">
+    <div class="col-md-12">
+        <h2>POS-Ansicht</h2>
+        <p class="text-muted" style="font-size:11px;margin:-6px 0 12px;">
+            Deploy-Check: @ViewBag.PosBuildUtc · View <code>PosStepper</code> (aus DLL) — ein alter <code>Views/Order/Pos.cshtml</code> auf dem Server wird ignoriert.
+        </p>
+        @if (TempData["PosMessage"] is string okMsg && !string.IsNullOrEmpty(okMsg))
+        {
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                @okMsg
+            </div>
+        }
+        @if (TempData["PosError"] is string errMsg && !string.IsNullOrEmpty(errMsg))
+        {
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                @errMsg
+            </div>
+        }
+
+        <div class="pos-section-title">Neu (nicht akzeptiert)</div>
+        @if (neu.Count == 0)
+        {
+            <p class="pos-empty">Keine neuen Bestellungen.</p>
+        }
+        else
+        {
+            <div class="pos-cards">
+                @foreach (var o in neu)
+                {
+                    var prepSteps = new[] { 15, 20, 30, 45, 50, 60 };
+                    var custApproxMin = OrderConfirmationMailHelper.TryParseCustomerApproximateMinutes(o.DeliveryTime);
+                    var initialPrep = custApproxMin.HasValue
+                        ? OrderConfirmationMailHelper.ClosestPreparationStep(prepSteps, custApproxMin.Value)
+                        : prepSteps[0];
+                    var customerWishText = OrderConfirmationMailHelper.FormatOrderWishDisplay(o);
+                    var isDelivery = KurierQrHelper.IsDeliveryPickupType(o.Pickup_type);
+                    var dest = $"{o.Street} {o.PostBox} {o.City}".Trim();
+                    var kurierQrUrl = Url.Action("KurierQrPng", "Order", new { id = o.Id }) ?? "";
+                    <div class="pos-card @(o.PosAcknowledged ? "pos-card--acknowledged" : "")" data-order-id="@o.Id">
+                        <div class="pos-badges">
+                            @if (isDelivery)
+                            {
+                                <span class="label label-warning">Lieferung</span>
+                            }
+                            else
+                            {
+                                <span class="label label-default">Abholung</span>
+                            }
+                            @if (o.PaymentWay != 1)
+                            {
+                                <span class="label label-success">Bezahlt</span>
+                            }
+                            else
+                            {
+                                <span class="label label-danger">Bar</span>
+                            }
+                            @if (o.IsPrinted)
+                            {
+                                <span class="label label-info">gedruckt</span>
+                            }
+                        </div>
+                        <div class="pos-name">@o.Name</div>
+                        <div class="pos-addr">@dest</div>
+
+                        @if (isDelivery && !string.IsNullOrWhiteSpace(dest))
+                        {
+                            <div class="pos-qr-wrap">
+                                <img src="@kurierQrUrl" alt="QR scannen – Kurier" width="140" height="140" />
+                                <div class="pos-qr-label">Kurier – QR scannen</div>
+                                <div class="pos-qr-label" style="font-size:10px;max-width:280px;margin:4px auto 0;">@dest</div>
+                            </div>
+                        }
+
+                        <div class="pos-total">CHF @o.FinalTotalNumber.ToString("F2") <span class="text-muted" style="font-size:12px;font-weight:600;">(Gesamtpreis)</span></div>
+                        <ul class="pos-items list-unstyled">
+                            @if (o.OrderItems != null)
+                            {
+                                foreach (var li in o.OrderItems)
+                                {
+                                    var pname = li.Product?.Name ?? "Artikel";
+                                    <li>@(li.Quantity) × @pname</li>
+                                }
+                            }
+                        </ul>
+
+                        <div class="pos-card-tail">
+                            <div class="pos-tail-prep">
+                                <div class="pos-prep">
+                                    @if (!o.PosAcknowledged)
+                                    {
+                                        <div class="pos-prep-hint" style="margin-bottom:8px;">
+                                            <strong>Kundenwunsch (aus Online-Bestellung):</strong> @customerWishText
+                                        </div>
+                                        <div class="pos-prep-hint" style="margin-bottom:8px;">
+                                            <strong>Fertigstellungszeit</strong> wählen, dann <strong>Akzeptieren</strong>. Hat der Kunde eine <strong>Wunschzeit</strong> (Uhrzeit) angegeben, steht in der E-Mail <em>nur diese</em> — keine zweite Zeile mit Minuten. Nur bei <strong>so schnell wie möglich</strong> enthält die Mail die Minuten von hier.
+                                        </div>
+                                        <p class="text-muted" style="font-size:12px;margin:0 0 6px;line-height:1.35;">Der rote <strong>CHF</strong>-Betrag oben ist der <strong>Preis</strong>, nicht Minuten.</p>
+                                        <form asp-controller="Order" asp-action="AcknowledgePosOrder" method="post" class="pos-minutes-form" data-prep-default="@initialPrep" data-prep-steps="15,20,30,45,50,60">
+                                            <input type="hidden" name="id" value="@o.Id" />
+                                            @* Select mit name="minutes" — immer im POST; +/- und Schnellwahl setzen denselben Wert. *@
+                                            <select name="minutes" id="prep-min-@o.Id" class="prep-minutes-select form-control" required aria-label="Lieferzeit Minuten" style="max-width:160px;margin:8px auto;display:block;font-size:15px;">
+                                                @foreach (var pm in prepSteps)
+                                                {
+                                                    if (pm == initialPrep)
+                                                    {
+                                                        <option value="@pm" selected>@pm Min.</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@pm">@pm Min.</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <div class="pos-prep-quick-btns" aria-label="Minuten Schnellwahl"></div>
+                                            <div class="pos-prep-stepper">
+                                                <button type="button" class="btn btn-default prep-minus" aria-label="Kürzer">−</button>
+                                                <span class="prep-time-label label label-default" style="font-size:14px;padding:8px 12px;">@(initialPrep == 60 ? "1 Std." : initialPrep + " Min.")</span>
+                                                <button type="button" class="btn btn-default prep-plus" aria-label="Länger">+</button>
+                                            </div>
+                                            <div class="pos-actions" style="margin-top:12px;">
+                                                <a class="btn btn-primary" href="@Url.Action("Details", "Order", new { id = o.Id })" style="flex:1 1 120px;">Details</a>
+                                                <button type="submit" class="btn btn-warning" style="flex:1 1 120px;">Akzeptieren</button>
+                                            </div>
+                                        </form>
+                                    }
+                                    else if (o.PreparationMinutesEmailed.HasValue)
+                                    {
+                                        var pm = o.PreparationMinutesEmailed.Value;
+                                        var sentLabel = pm == 60 ? "1 Std." : $"{pm} Min.";
+                                        <div class="pos-prep-hint text-success" style="margin-bottom:0;">
+                                            Bestätigung mit Lieferzeit (@sentLabel) an Kunde gesendet. Kein erneuter Versand.
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="pos-prep-hint text-warning">
+                                            Datenlage ungewöhnlich (angenommen, aber ohne gespeicherte Lieferzeit-Mail). Bitte Support/DB prüfen — kein zweiter Kunden-Mail-Versand mehr über diese Maske.
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @if (o.PosAcknowledged)
+                            {
+                                <div class="pos-tail-actions">
+                                    <div class="pos-actions">
+                                        <a class="btn btn-primary" href="@Url.Action("Details", "Order", new { id = o.Id })" style="flex:1 1 120px;">Details</a>
+                                        <button type="button" class="btn btn-default" disabled style="flex:1 1 120px;width:100%;">Angenommen</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (gedruckt.Count > 0)
+        {
+            <div class="pos-section-title">Bereits angenommen (@gedruckt.Count)</div>
+            <div class="pos-cards">
+                @foreach (var o in gedruckt.Take(12))
+                {
+                    <div class="pos-card" style="opacity:.92;">
+                        <div class="pos-badges">
+                            <span class="label label-success">gedruckt</span>
+                            @{
+                                var currentStatus = o.OrderStatus ?? "New";
+                                var statusColor = currentStatus switch {
+                                    "New" => "default",
+                                    "Preparing" => "info",
+                                    "OutForDelivery" => "warning",
+                                    "Delivered" => "success",
+                                    _ => "default"
+                                };
+                                var statusLabel = currentStatus switch {
+                                    "New" => "Neu",
+                                    "Preparing" => "In Zubereitung",
+                                    "OutForDelivery" => "Unterwegs",
+                                    "Delivered" => "Geliefert",
+                                    _ => currentStatus
+                                };
+                            }
+                            <span class="label label-@statusColor">@statusLabel</span>
+                        </div>
+                        <div class="pos-name">#@o.Id — @o.Name</div>
+                        <div class="pos-addr">CHF @o.FinalTotalNumber.ToString("F2")</div>
+                        
+                        @if (currentStatus != "Delivered")
+                        {
+                            <div style="margin: 10px 0;">
+                                <form asp-controller="Order" asp-action="MarkOutForDelivery" method="post" style="margin:0;">
+                                    <input type="hidden" name="id" value="@o.Id" />
+                                    @if (currentStatus == "New")
+                                    {
+                                        <button type="submit" class="btn btn-warning btn-sm btn-block" style="width:100%; margin-bottom:5px;">
+                                            🍕 Als "In Zubereitung" markieren
+                                        </button>
+                                    }
+                                    else if (currentStatus == "Preparing")
+                                    {
+                                        <button type="submit" class="btn btn-primary btn-sm btn-block" style="width:100%; margin-bottom:5px;">
+                                            🚀 Als "Unterwegs" markieren + E-Mail an Kunde
+                                        </button>
+                                    }
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="background:#e8f5e9; padding:8px 12px; border-radius:5px; text-align:center; margin:10px 0;">
+                                <span style="color:#2e7d32;">✅ Abgeschlossen</span>
+                            </div>
+                        }
+                        
+                        <div class="pos-actions">
+                            <a class="btn btn-default btn-sm" href="@Url.Action("Details", "Order", new { id = o.Id })">Details</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+window.wangenHasPendingUnacceptedOrders = @(neu.Count > 0 ? "true" : "false");
+(function () {
+    function formatMinutes(m) {
+        return m === 60 ? '1 Std.' : (m + ' Min.');
+    }
+    document.querySelectorAll('.pos-minutes-form').forEach(function (form) {
+        var raw = form.getAttribute('data-prep-steps') || '15,20,30,45,50,60';
+        var steps = raw.split(',').map(function (s) { return parseInt(s, 10); }).filter(function (n) { return !isNaN(n); });
+        if (steps.length === 0) return;
+        var def = parseInt(form.getAttribute('data-prep-default'), 10);
+        var idx = 0;
+        if (!isNaN(def)) {
+            var j = steps.indexOf(def);
+            if (j >= 0) idx = j;
+        }
+        var sel = form.querySelector('.prep-minutes-select');
+        var label = form.querySelector('.prep-time-label');
+        var minus = form.querySelector('.prep-minus');
+        var plus = form.querySelector('.prep-plus');
+        var submitBtn = form.querySelector('button[type="submit"]');
+        var quickWrap = form.querySelector('.pos-prep-quick-btns');
+        var quickBtns = [];
+        if (!sel || !label || !minus || !plus || !submitBtn) return;
+
+        function sync() {
+            var m = steps[idx];
+            sel.value = String(m);
+            label.textContent = formatMinutes(m);
+            minus.disabled = idx <= 0;
+            plus.disabled = idx >= steps.length - 1;
+            for (var q = 0; q < quickBtns.length; q++) {
+                if (q === idx) quickBtns[q].classList.add('active');
+                else quickBtns[q].classList.remove('active');
+            }
+        }
+        if (quickWrap) {
+            for (var i = 0; i < steps.length; i++) {
+                (function (stepIndex) {
+                    var m = steps[stepIndex];
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'btn btn-default prep-quick';
+                    b.setAttribute('aria-label', m === 60 ? '60 Minuten' : m + ' Minuten');
+                    b.textContent = m === 60 ? '60' : String(m);
+                    b.addEventListener('click', function () {
+                        idx = stepIndex;
+                        sync();
+                    });
+                    quickWrap.appendChild(b);
+                    quickBtns.push(b);
+                })(i);
+            }
+        }
+        minus.addEventListener('click', function () {
+            if (idx > 0) { idx--; sync(); }
+        });
+        plus.addEventListener('click', function () {
+            if (idx < steps.length - 1) { idx++; sync(); }
+        });
+        form.addEventListener('submit', function () {
+            var v = parseInt(sel.value, 10);
+            var j = steps.indexOf(v);
+            if (j >= 0) idx = j;
+            sync();
+            submitBtn.disabled = true;
+            window.setTimeout(function () { submitBtn.disabled = false; }, 12000);
+        });
+        sync();
+    });
+})();
+</script>
+

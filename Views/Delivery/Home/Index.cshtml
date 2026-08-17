@@ -1,0 +1,75 @@
+@model WangenPizza.Dtos.HomeDto
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (TempData["DashboardLoadError"] is string dashErr && !string.IsNullOrEmpty(dashErr))
+{
+    <div class="alert alert-warning" role="alert">@dashErr</div>
+}
+
+<div class="row top_tiles">
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-check-square-o"></i></div>
+            <div class="count">@Model.OrdersCount</div>
+            <h3>Bestellungen </h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-money"></i></div>
+            <div class="count">@Model.OrdersTotalPrice</div>
+            <h3>Bestellungskosten </h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-comments-o"></i></div>
+            <div class="count">@Model.ContactsCount</div>
+            <h3>Kontaktanfragen</h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-cubes"></i></div>
+            <div class="count">@Model.OffersCount</div>
+            <h3>Angebote </h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-cubes"></i></div>
+            <div class="count">@Model.TodayBonusCount</div>
+            <h3>Bonus-Bestellungen </h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-clone"></i></div>
+            <div class="count">@Model.CategoriesCount</div>
+            <h3>Menü-Kategorien </h3>
+        </div>
+    </div>
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-cutlery"></i></div>
+            <div class="count">@Model.ProductsCount</div>
+            <h3>Menüpunkte </h3>
+        </div>
+    </div>
+
+    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        <div class="tile-stats">
+            <div class="icon"><i class="fa fa-sort-amount-desc"></i></div>
+            <div class="count">@Model.CouponCodesCount</div>
+            <h3>Bestell-Gutscheine </h3>
+        </div>
+    </div>
+</div>  
+
+<div class="row top_tiles text-center" style="margin-top: 100px; color:white;">
+    <h1 style=" font-size: 50px;font-weight: 700;">
+        Hier sind einige statistische Daten zum aktuellen Datenbankinhalt.
+    </h1>
+    </div>

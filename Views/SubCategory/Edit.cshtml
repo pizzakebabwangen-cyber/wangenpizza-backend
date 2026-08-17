@@ -1,0 +1,64 @@
+﻿@model WangenPizza.Dtos.SubCategoryDto
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2> Untetitel (Kategorie) bearbeiten</h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="SubCategory" asp-action="Edit" class="form-horizontal form-label-left" >
+
+          
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                     Menügruppe <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Kategoriename <span class="required">*</span>
+                </label>
+                    <div class="form-group">
+
+
+
+                        <div class="col-md-7 col-sm-12 col-xs-12">
+                            <select id="heard" asp-for="CategoryId" class="form-control" required="">
+                                <option value="">Choose..</option>
+                                @foreach (var category in ViewBag.CategoryList)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+
+                                }
+
+                            </select>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="SubCategory" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>

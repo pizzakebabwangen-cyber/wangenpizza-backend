@@ -1,0 +1,67 @@
+@model WangenPizza.Dtos.CategoryDto
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Hauptmenü-Gruppen bearbeiten</h2>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+
+
+        <form asp-controller="Category" asp-action="Edit" class="form-horizontal form-label-left" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="PhotoName" />
+
+            <div class="form-group">
+
+                <div class="col-md-12" style="display: flex;align-items: center;justify-content: center;">
+                    <img src="~/Images/@Model.PhotoName" style="height:200px" />
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="first-name">
+                    Hauptmenü-Name <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="text" asp-for="Name" required="required" class="form-control ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3" for="last-name">
+                    Menübild <span class="required">*</span>
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="file" asp-for="Photo"  class="form-control ">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3">
+                    Reihenfolge im Menü (Shop)
+                </label>
+                <div class="col-md-7 col-sm-12 col-xs-12">
+                    <input type="number" asp-for="DisplayOrder" class="form-control" min="0" step="1" />
+                    <span class="help-block">Kleinere Zahl = weiter oben in der Hauptmenü-Leiste.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a asp-controller="Category" asp-action="Index" class="btn btn-danger" type="button">Abbrechen</a>
+                    <input type="submit" class="btn btn-success" value="Speichern">
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</div>

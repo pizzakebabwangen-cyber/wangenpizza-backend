@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Email Verified";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="~/Dashboard/images/logo.png" />
+
+    <title>Wangen - Reset Password</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.3/components/logins/login-4/assets/css/login-4.css">
+
+    <!-- Font Awesome -->
+
+</head>
+
+<body>
+    <!-- Login 4 - Bootstrap Brain Component -->
+    <section class="">
+
+        <div class="card border-light-subtle shadow-sm" style="background-image: url('@Url.Content("~/Dashboard/images/Dashboardbg.png")');">
+            <div class="align-content-center d-flex g-0 justify-content-center row" style="height: 100vh;">
+
+                <div class="align-items-center col-12 col-md-4 justify-content-center" style="background-color: #2a5172;">
+                    <div class="card-body p-3 p-md-4 p-xl-5">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-5 text-center">
+                                    <img src="~/Dashboard/images/logo.png" class="h-25 mb-3" alt="">
+
+                                    <h4 style="font-weight: 600;color: white;">Die E-Mail wurde bestätigt und Ihre Anfrage wurde erfolgreich gesendet</h4>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if (TempData["Succeeded"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: "Passwort erfolgreich zurückgesetzt  !",
+                text: "Sie können sich jetzt mit neuem Passwort anmelden ",
+                icon: "success",
+            });
+        </script>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "Fehler...",
+                text: "Etwas ist schief gelaufen!"
+
+            });
+        </script>
+    }
+    @if (TempData["notmatched"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "Fehler...",
+                text: "Passwort und Passwort bestätigen stimmen nicht überein"
+
+            });
+        </script>
+    }
+</body>
+</html>
