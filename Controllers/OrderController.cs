@@ -505,6 +505,34 @@ namespace WangenPizza.Controllers
         }
         #endregion
 
+        #region OrderTracking API
+
+        /// <summary>Public endpoint: GET /api/Order/{id}/status — returns order tracking info for customers.</summary>
+        [HttpGet("{id}/status")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetOrderStatus(int id)
+        {
+            if (id <= 0)
+                return NotFound(new { message = "Ungültige Bestellnummer." });
+
+            var order = await context.Orders
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+                return NotFound(new { message = "Bestellung nicht gefunden." });
+
+            return Ok(new
+            {
+                orderId = order.Id,
+                name = order.Name,
+                status = order.OrderStatus ?? "New",
+                street = order.Street,
+                city = order.City
+            });
+        }
+
+        #endregion
     
     }
 }
