@@ -35,3 +35,6 @@ newfile.zip
 *.exe
 *.pdb
 *.xml
+
+# Duplicate/backup project folders
+.config/WangenPizza-one-place/
